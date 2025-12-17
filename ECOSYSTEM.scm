@@ -1,15 +1,15 @@
 ;; SPDX-License-Identifier: AGPL-3.0-or-later
 ;; SPDX-FileCopyrightText: 2025 Jonathan D.A. Jewell
-;; ECOSYSTEM.scm — template-repo
+;; ECOSYSTEM.scm — divisionone-ssg
 
 (ecosystem
   (version "1.0.0")
-  (name "template-repo")
-  (type "project")
-  (purpose "Project in the hyperpolymath ecosystem")
+  (name "divisionone-ssg")
+  (type "satellite")
+  (purpose "Unified SSG adapter collection - satellite of poly-ssg-mcp hub")
 
   (position-in-ecosystem
-    "Part of hyperpolymath ecosystem. Follows RSR guidelines.")
+    "Satellite SSG implementation. Receives adapter updates from poly-ssg-mcp hub. Provides standalone access to 28 SSG adapters via MCP.")
 
   (related-projects
     (project
@@ -24,5 +24,7 @@
              (url "https://github.com/hyperpolymath/rhodium-standard-repositories")
              (relationship "standard")))
 
-  (what-this-is "Project in the hyperpolymath ecosystem")
-  (what-this-is-not "- NOT exempt from RSR compliance"))
+  (what-this-is "Satellite repository providing 28 SSG adapters synchronized from poly-ssg-mcp hub")
+  (what-this-is-not "- NOT the hub (poly-ssg-mcp is the hub)
+                     - NOT a standalone SSG itself
+                     - NOT exempt from RSR compliance"))
