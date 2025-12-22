@@ -1,0 +1,813 @@
+= Division One SSG Cookbook
+Jonathan D.A. Jewell <jonathan@hyperpolymath.org>
+v1.0.0, 2025-12-17
+:toc: left
+:toclevels: 4
+:icons: font
+:source-highlighter: highlight.js
+:experimental:
+:sectnums:
+
+== Overview
+
+This cookbook provides comprehensive recipes for working with Division One SSG adapters. It covers CLI commands, Just recipes, Nickel formulae, and advanced combinatorics for build automation.
+
+[[cli]]
+== CLI Commands
+
+=== Deno Commands
+
+==== Basic Operations
+
+[source,bash]
+----
+# Format adapter code
+deno fmt adapters/
+
+# Check formatting without changes
+deno fmt --check adapters/
+
+# Lint all adapters
+deno lint adapters/
+
+# Run tests
+deno test --allow-run --allow-read
+
+# Run with coverage
+deno test --allow-run --allow-read --coverage=coverage/
+----
+
+==== Adapter Execution
+
+[source,bash]
+----
+# Run a specific adapter
+deno run --allow-run adapters/zola.js
+
+# REPL with adapter loaded
+deno repl --allow-run
+> import * as zola from "./adapters/zola.js"
+> await zola.connect()
+----
+
+==== Security Scanning
+
+[source,bash]
+----
+# Lint with security rules
+deno lint adapters/ --rules=no-eval
+
+# Check for banned patterns
+deno lint --rules-exclude=no-explicit-any adapters/
+----
+
+=== Git Commands
+
+==== Branch Operations
+
+[source,bash]
+----
+# Feature branch
+git checkout -b feat/new-adapter
+
+# Security fix branch
+git checkout -b security/fix-injection
+
+# Documentation branch
+git checkout -b docs/update-cookbook
+----
+
+==== Conventional Commits
+
+[source,bash]
+----
+# Feature commit
+git commit -m "feat(adapters): add new SSG adapter for X"
+
+# Fix commit
+git commit -m "fix(zola): correct path handling"
+
+# Security commit
+git commit -m "security(adapters): prevent command injection"
+
+# Documentation commit
+git commit -m "docs: update cookbook with new recipes"
+----
+
+=== Container Commands
+
+==== Podman/Docker
+
+[source,bash]
+----
+# Build container
+podman build -t divisionone-ssg .
+
+# Run interactive
+podman run -it --rm -v $(pwd):/app divisionone-ssg
+
+# Run specific command
+podman run --rm divisionone-ssg deno lint adapters/
+
+# Run tests in container
+podman run --rm divisionone-ssg deno test --allow-run
+----
+
+[[just]]
+== Just Recipes
+
+=== Quick Reference
+
+[cols="2,3,2"]
+|===
+|Command |Description |Category
+
+|`just`
+|Run default (check)
+|Default
+
+|`just setup`
+|Initialize environment
+|Setup
+
+|`just fmt`
+|Format code
+|Development
+
+|`just lint`
+|Run linter
+|Development
+
+|`just check`
+|Format + lint
+|Development
+
+|`just test`
+|Run unit tests
+|Testing
+
+|`just test-all`
+|Run all tests
+|Testing
+
+|`just test-e2e`
+|Run e2e tests
+|Testing
+
+|`just list-adapters`
+|List all adapters
+|Adapters
+
+|`just validate-adapters`
+|Validate structure
+|Adapters
+
+|`just sync-adapters`
+|Sync from hub
+|Adapters
+
+|`just security`
+|Security scan
+|Security
+
+|`just audit`
+|Full security audit
+|Security
+
+|`just docs`
+|Build documentation
+|Documentation
+
+|`just release`
+|Create release
+|Release
+
+|`just clean`
+|Clean artifacts
+|Cleanup
+
+|`just ci`
+|CI pipeline
+|CI/CD
+|===
+
+=== Recipe Combinations
+
+==== Development Workflow
+
+[source,bash]
+----
+# Full development check
+just fmt && just lint && just test
+
+# Quick validation
+just check
+
+# Pre-commit workflow
+just pre-commit
+
+# Pre-push workflow
+just pre-push
+----
+
+==== Release Workflow
+
+[source,bash]
+----
+# Full release pipeline
+just test-all && just audit && just docs && just release
+
+# Version bump
+just version-bump patch   # 0.1.0 -> 0.1.1
+just version-bump minor   # 0.1.0 -> 0.2.0
+just version-bump major   # 0.1.0 -> 1.0.0
+----
+
+==== Adapter Operations
+
+[source,bash]
+----
+# List and validate
+just list-adapters && just validate-adapters
+
+# Sync and test
+just sync-adapters && just test-adapters
+
+# Test specific adapter
+just test-adapter zola
+just test-adapter hakyll
+----
+
+[[nickel]]
+== Nickel Formulae
+
+=== Adapter Schema
+
+[source,nickel]
+----
+# Adapter type definition
+let Adapter = {
+  name | String,
+  language | String,
+  description | String,
+  tools | Array {
+    name | String,
+    description | String,
+    inputSchema | { type | String, properties | Dyn },
+    execute | Dyn
+  }
+}
+----
+
+=== Build Configuration
+
+[source,nickel]
+----
+# Build configuration schema
+let BuildConfig = {
+  target | String | default = "adapters",
+  format | Bool | default = true,
+  lint | Bool | default = true,
+  test | Bool | default = true,
+  coverage | Number | default = 70,
+  security | Bool | default = true
+}
+
+# Example configuration
+let config : BuildConfig = {
+  target = "adapters",
+  format = true,
+  lint = true,
+  test = true,
+  coverage = 80,
+  security = true
+}
+----
+
+=== Validation Rules
+
+[source,nickel]
+----
+# Adapter validation contract
+let ValidAdapter = {
+  # Must have SPDX header
+  spdx_header | String | force "SPDX-License-Identifier required",
+
+  # Required exports
+  name | String | not_empty,
+  language | String | not_empty,
+  description | String | not_empty,
+
+  # Must have at least one tool
+  tools | Array | min_length 1,
+
+  # Security: no eval usage
+  no_eval | Bool | = true
+}
+----
+
+=== Pipeline Definition
+
+[source,nickel]
+----
+# CI pipeline configuration
+let Pipeline = {
+  stages | Array String | default = ["lint", "test", "security", "build"],
+
+  jobs | {
+    lint | {
+      runs_on | String | default = "ubuntu-latest",
+      steps | Array String | default = ["checkout", "setup-deno", "lint"]
+    },
+    test | {
+      runs_on | String | default = "ubuntu-latest",
+      steps | Array String | default = ["checkout", "setup-deno", "test"]
+    },
+    security | {
+      runs_on | String | default = "ubuntu-latest",
+      steps | Array String | default = ["checkout", "codeql"]
+    }
+  }
+}
+----
+
+[[combinatorics]]
+== CLI Combinatorics
+
+=== Command Permutations
+
+==== Sequential Operations (&&)
+
+Commands that must succeed in order:
+
+[source,bash]
+----
+# Format -> Lint -> Test
+deno fmt adapters/ && deno lint adapters/ && deno test
+
+# Validate -> Sync -> Test
+just validate-adapters && just sync-adapters && just test
+
+# Check -> Security -> Release
+just check && just security && just release
+----
+
+==== Parallel Operations (|)
+
+Commands that can run independently:
+
+[source,bash]
+----
+# Parallel formatting and linting
+deno fmt adapters/ & deno lint adapters/ & wait
+
+# Parallel tests
+just test & just test-e2e & wait
+----
+
+==== Conditional Operations (||)
+
+Fallback on failure:
+
+[source,bash]
+----
+# Try format, fallback to check
+deno fmt adapters/ || deno fmt --check adapters/
+
+# Try test, report on failure
+deno test || echo "Tests failed"
+----
+
+=== Pipeline Patterns
+
+==== Development Pipeline
+
+[source,bash]
+----
+#!/bin/bash
+# dev-pipeline.sh
+
+set -e
+
+echo "=== Development Pipeline ==="
+
+echo "Step 1: Format"
+just fmt
+
+echo "Step 2: Lint"
+just lint
+
+echo "Step 3: Test"
+just test
+
+echo "Step 4: Validate Adapters"
+just validate-adapters
+
+echo "=== Pipeline Complete ==="
+----
+
+==== Release Pipeline
+
+[source,bash]
+----
+#!/bin/bash
+# release-pipeline.sh
+
+set -e
+
+echo "=== Release Pipeline ==="
+
+# Stage 1: Quality
+echo "Stage 1: Quality Checks"
+just check
+just security
+
+# Stage 2: Testing
+echo "Stage 2: Testing"
+just test-all
+
+# Stage 3: Documentation
+echo "Stage 3: Documentation"
+just docs
+
+# Stage 4: Release
+echo "Stage 4: Release"
+just version-bump ${1:-patch}
+just changelog
+just release
+
+echo "=== Release Complete ==="
+----
+
+==== Adapter Sync Pipeline
+
+[source,bash]
+----
+#!/bin/bash
+# sync-pipeline.sh
+
+set -e
+
+echo "=== Adapter Sync Pipeline ==="
+
+# Fetch from hub
+just sync-adapters
+
+# Validate all adapters
+just validate-adapters
+
+# Run tests
+just test-adapters
+
+# Commit if changes
+git diff --quiet adapters/ || {
+    git add adapters/
+    git commit -m "chore(adapters): sync from poly-ssg-mcp hub"
+}
+
+echo "=== Sync Complete ==="
+----
+
+=== Matrix Operations
+
+==== Adapter Matrix Testing
+
+[source,bash]
+----
+#!/bin/bash
+# test-matrix.sh
+
+ADAPTERS=(zola hakyll serum franklin cryogen)
+OPERATIONS=(connect build version)
+
+for adapter in "${ADAPTERS[@]}"; do
+    for op in "${OPERATIONS[@]}"; do
+        echo "Testing: $adapter.$op"
+        just test-adapter $adapter $op
+    done
+done
+----
+
+==== Language Matrix
+
+[source,bash]
+----
+#!/bin/bash
+# language-matrix.sh
+
+declare -A LANG_ADAPTERS=(
+    ["rust"]="zola cobalt mdbook"
+    ["haskell"]="hakyll ema"
+    ["elixir"]="serum nimble-publisher tableau"
+    ["julia"]="franklin documenter staticwebpages"
+)
+
+for lang in "${!LANG_ADAPTERS[@]}"; do
+    echo "=== $lang adapters ==="
+    for adapter in ${LANG_ADAPTERS[$lang]}; do
+        just test-adapter $adapter
+    done
+done
+----
+
+[[hooks]]
+== Git Hooks
+
+=== Pre-commit Hook
+
+[source,bash]
+----
+#!/bin/bash
+# .git/hooks/pre-commit
+
+set -e
+
+echo "Running pre-commit checks..."
+
+# Format check
+deno fmt --check adapters/ || {
+    echo "Format check failed. Run: deno fmt adapters/"
+    exit 1
+}
+
+# Lint
+deno lint adapters/ || {
+    echo "Lint failed. Fix issues and retry."
+    exit 1
+}
+
+echo "Pre-commit checks passed!"
+----
+
+=== Pre-push Hook
+
+[source,bash]
+----
+#!/bin/bash
+# .git/hooks/pre-push
+
+set -e
+
+echo "Running pre-push checks..."
+
+# Full test suite
+deno test --allow-run --allow-read || {
+    echo "Tests failed. Fix issues before pushing."
+    exit 1
+}
+
+# Security check
+just security || {
+    echo "Security check failed."
+    exit 1
+}
+
+echo "Pre-push checks passed!"
+----
+
+=== Post-merge Hook
+
+[source,bash]
+----
+#!/bin/bash
+# .git/hooks/post-merge
+
+echo "Running post-merge tasks..."
+
+# Sync adapters if hub updated
+just sync-adapters 2>/dev/null || true
+
+# Validate adapters
+just validate-adapters
+
+echo "Post-merge tasks complete."
+----
+
+[[advanced]]
+== Advanced Recipes
+
+=== Parallel Adapter Testing
+
+[source,bash]
+----
+#!/bin/bash
+# parallel-test.sh
+
+# Test all adapters in parallel (max 4 concurrent)
+ls adapters/*.js | xargs -P 4 -I {} basename {} .js | \
+while read adapter; do
+    deno test --allow-run adapters/${adapter}.test.js &
+done
+wait
+
+echo "All adapter tests complete."
+----
+
+=== Coverage Report Generation
+
+[source,bash]
+----
+#!/bin/bash
+# coverage-report.sh
+
+# Run tests with coverage
+deno test --allow-run --allow-read --coverage=coverage/
+
+# Generate LCOV
+deno coverage coverage/ --lcov > coverage/lcov.info
+
+# Generate HTML (if genhtml available)
+command -v genhtml >/dev/null && {
+    genhtml coverage/lcov.info -o coverage/html
+    echo "HTML report: coverage/html/index.html"
+}
+----
+
+=== Adapter Template Generator
+
+[source,bash]
+----
+#!/bin/bash
+# new-adapter.sh
+
+NAME=$1
+LANGUAGE=$2
+
+if [ -z "$NAME" ] || [ -z "$LANGUAGE" ]; then
+    echo "Usage: $0 <adapter-name> <language>"
+    exit 1
+fi
+
+cat > adapters/${NAME}.js << EOF
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2025 Jonathan D.A. Jewell
+
+/**
+ * ${NAME} adapter
+ */
+
+export const name = "${NAME}";
+export const language = "${LANGUAGE}";
+export const description = "${NAME} static site generator";
+
+let connected = false;
+let binaryPath = "${NAME}";
+
+async function runCommand(args, cwd = null) {
+  const cmd = new Deno.Command(binaryPath, {
+    args,
+    cwd: cwd || Deno.cwd(),
+    stdout: "piped",
+    stderr: "piped",
+  });
+  const output = await cmd.output();
+  const decoder = new TextDecoder();
+  return {
+    success: output.success,
+    stdout: decoder.decode(output.stdout),
+    stderr: decoder.decode(output.stderr),
+    code: output.code,
+  };
+}
+
+export async function connect() {
+  try {
+    const result = await runCommand(["--version"]);
+    connected = result.success;
+    return connected;
+  } catch {
+    connected = false;
+    return false;
+  }
+}
+
+export async function disconnect() {
+  connected = false;
+}
+
+export function isConnected() {
+  return connected;
+}
+
+export const tools = [
+  {
+    name: "${NAME}_version",
+    description: "Get ${NAME} version",
+    inputSchema: { type: "object", properties: {} },
+    execute: async () => await runCommand(["--version"]),
+  },
+];
+EOF
+
+echo "Created adapters/${NAME}.js"
+----
+
+[[troubleshooting]]
+== Troubleshooting
+
+=== Common Issues
+
+==== Deno Permission Errors
+
+[source,bash]
+----
+# Error: Requires run access
+# Solution: Add --allow-run flag
+deno test --allow-run adapters/
+
+# Error: Requires read access
+# Solution: Add --allow-read flag
+deno run --allow-read --allow-run adapters/zola.js
+----
+
+==== Format Conflicts
+
+[source,bash]
+----
+# Fix formatting issues
+deno fmt adapters/
+
+# Check what would change
+deno fmt --check adapters/ 2>&1 | head -20
+----
+
+==== Lint Errors
+
+[source,bash]
+----
+# Show all lint rules
+deno lint --rules
+
+# Ignore specific rule (in code)
+// deno-lint-ignore no-explicit-any
+
+# Run with specific rules only
+deno lint --rules=no-eval adapters/
+----
+
+=== Debugging
+
+==== Verbose Output
+
+[source,bash]
+----
+# Verbose test output
+deno test --allow-run -A --trace-ops
+
+# Debug adapter
+DENO_LOG=debug deno run --allow-run adapters/zola.js
+----
+
+==== Inspect Adapter
+
+[source,bash]
+----
+# REPL inspection
+deno repl --allow-run
+> const zola = await import("./adapters/zola.js")
+> console.log(zola.tools)
+> await zola.connect()
+----
+
+---
+
+== Quick Reference Card
+
+[cols="1,2"]
+|===
+|Task |Command
+
+|Format
+|`just fmt` or `deno fmt adapters/`
+
+|Lint
+|`just lint` or `deno lint adapters/`
+
+|Test
+|`just test` or `deno test --allow-run`
+
+|Full check
+|`just check`
+
+|Security scan
+|`just security`
+
+|List adapters
+|`just list-adapters`
+
+|Validate adapters
+|`just validate-adapters`
+
+|Build docs
+|`just docs`
+
+|Clean
+|`just clean`
+
+|CI pipeline
+|`just ci`
+|===
+
+---
+
+Copyright (C) 2025 Jonathan D.A. Jewell

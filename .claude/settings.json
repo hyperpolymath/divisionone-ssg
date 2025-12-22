@@ -1,0 +1,42 @@
+{
+  "$schema": "https://claude.ai/schemas/settings.json",
+  "version": "1.0.0",
+  "project": "divisionone-ssg",
+
+  "permissions": {
+    "allow_run": true,
+    "allow_read": true,
+    "allow_write": true,
+    "allow_net": false
+  },
+
+  "tools": {
+    "preferred": ["deno", "just", "git"],
+    "formatters": {
+      "javascript": "deno fmt",
+      "typescript": "deno fmt"
+    },
+    "linters": {
+      "javascript": "deno lint",
+      "typescript": "deno lint"
+    }
+  },
+
+  "security": {
+    "require_spdx_headers": true,
+    "block_eval": true,
+    "block_shell_interpolation": true,
+    "require_array_args": true
+  },
+
+  "testing": {
+    "command": "deno test --allow-run --allow-read",
+    "coverage_target": 70
+  },
+
+  "adapters": {
+    "directory": "adapters",
+    "count": 28,
+    "sync_source": "poly-ssg-mcp"
+  }
+}
