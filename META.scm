@@ -3,7 +3,7 @@
 ;;; META.scm — divisionone-ssg
 
 (define-module (divisionone-ssg meta)
-  #:export (architecture-decisions development-practices design-rationale build-system))
+  #:export (architecture-decisions development-practices design-rationale))
 
 (define architecture-decisions
   '((adr-001
@@ -47,31 +47,10 @@
      (consequences . ("Portable recipes" "Declarative constraints" "CI/CD integration")))))
 
 (define development-practices
-  '((code-style
-      (languages . ("javascript" "typescript"))
-      (formatter . "deno fmt")
-      (linter . "deno lint")
-      (conventions . ("SPDX headers" "JSDoc comments" "Conventional commits")))
-
-    (security
-      (sast . "CodeQL")
-      (credentials . "env vars only")
-      (command-execution . "Deno.Command with array args")
-      (forbidden . ("eval" "Function constructor" "shell interpolation")))
-
-    (testing
-      (framework . "deno test")
-      (coverage-minimum . 70)
-      (types . ("unit" "integration" "e2e")))
-
-    (versioning
-      (scheme . "SemVer 2.0.0")
-      (changelog . "conventional-changelog"))
-
-    (documentation
-      (format . "AsciiDoc")
-      (api-docs . "JSDoc")
-      (diagrams . "Mermaid"))))
+  '((code-style (languages . ("javascript" "typescript")) (formatter . "deno fmt") (linter . "deno lint"))
+    (security (sast . "CodeQL") (credentials . "env vars only"))
+    (testing (coverage-minimum . 70))
+    (versioning (scheme . "SemVer 2.0.0"))))
 
 (define design-rationale
   '((why-rsr "RSR ensures consistency, security, and maintainability across the hyperpolymath ecosystem.")

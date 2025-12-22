@@ -9,7 +9,7 @@
   (purpose "Unified SSG adapter collection - satellite of poly-ssg-mcp hub")
 
   (position-in-ecosystem
-    "Satellite SSG implementation. Receives adapter updates from poly-ssg-mcp hub. Provides standalone access to 28 SSG adapters via MCP across 17 programming languages.")
+    "Satellite SSG implementation. Receives adapter updates from poly-ssg-mcp hub. Provides standalone access to 28 SSG adapters via MCP.")
 
   (related-projects
     (project
@@ -58,8 +58,7 @@
     "Satellite repository providing 28 SSG adapters synchronized from poly-ssg-mcp hub.
      Enables AI agents to orchestrate static site generation across multiple languages.")
 
-  (what-this-is-not
-    "- NOT the hub (poly-ssg-mcp is the hub)
-     - NOT a standalone SSG itself
-     - NOT a replacement for individual SSGs
-     - NOT exempt from RSR compliance"))
+  (what-this-is "Satellite repository providing 28 SSG adapters synchronized from poly-ssg-mcp hub")
+  (what-this-is-not "- NOT the hub (poly-ssg-mcp is the hub)
+                     - NOT a standalone SSG itself
+                     - NOT exempt from RSR compliance"))
